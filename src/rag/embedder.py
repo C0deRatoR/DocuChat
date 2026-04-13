@@ -5,11 +5,11 @@ import os
 
 def get_embeddings_model():
     """Returns the Gemini embedding model configured via LangChain."""
-    return GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    return GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
 
 def build_faiss_index(documents: list[Document]) -> FAISS:
     """
-    Takes a list of LangChain Documents and embeds them using Gemini's embedding-001 model,
+    Takes a list of LangChain Documents and embeds them using Gemini's text-embedding-004 model,
     then stores the resulting vectors in a LangChain FAISS vector store.
     """
     embeddings = get_embeddings_model()
