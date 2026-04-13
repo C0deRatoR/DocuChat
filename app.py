@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 
 from src.utils.pdf_utils import PDFProcessingError
@@ -62,6 +63,45 @@ with st.sidebar:
             st.success("Loaded previous document index.")
         except:
             pass
+
+    # --- Export Chat History ---
+    if st.session_state.messages:
+        st.divider()
+        st.header("Export")
+
+        def _build_chat_markdown() -> str:
+            """Formats the current chat history as a downloadable Markdown string."""
+            lines = [
+                "# DocuChat – Conversation Export",
+                f"_Exported on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_",
+                "",
+                "---",
+                "",
+            ]
+            for msg in st.session_state.messages:
+                role_label = "🧑 **You**" if msg["role"] == "user" else "🤖 **DocuChat**"
+                lines.append(f"### {role_label}")
+                lines.append("")
+                lines.append(msg["content"])
+                lines.append("")
+                if "sources" in msg:
+                    lines.append("<details><summary>📄 Sources</summary>")
+                    lines.append("")
+                    for src in msg["sources"]:
+                        lines.append(f"- **Page {src['page']}**: {src['content']}…")
+                    lines.append("")
+                    lines.append("</details>")
+                    lines.append("")
+                lines.append("---")
+                lines.append("")
+            return "\n".join(lines)
+
+        st.download_button(
+            label="📥 Download Chat as Markdown",
+            data=_build_chat_markdown(),
+            file_name=f"docuchat_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
+            mime="text/markdown",
+        )
 
 # Main Chat Interface
 if st.session_state.vector_store is None:
