@@ -26,7 +26,7 @@ def build_qa_chain(vector_store: FAISS):
     Uses Gemini 1.5 Flash for answering and a custom strict grounding prompt.
     Returns the chain.
     """
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
     retriever = get_retriever(vector_store, k=5)
     
     qa_prompt = get_qa_prompt()
