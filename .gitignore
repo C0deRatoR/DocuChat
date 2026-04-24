@@ -23,8 +23,7 @@ faiss_index/
 *.db
 *.sqlite3
 PRD.docx
-*.docx  
-
+features.md
 
 
 # OS generated files

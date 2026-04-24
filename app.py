@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from src.utils.pdf_utils import PDFProcessingError
 from src.rag.ingest import process_pdf
 from src.rag.embedder import build_faiss_index, save_faiss_index, load_faiss_index
+from src.rag.summarizer import summarize_documents
 from src.rag.chain import build_qa_chain
 
 # Load environment variables
@@ -23,6 +24,8 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "vector_store" not in st.session_state:
     st.session_state.vector_store = None
+if "doc_summary" not in st.session_state:
+    st.session_state.doc_summary = None
 
 # Sidebar for controls
 with st.sidebar:
@@ -51,10 +54,20 @@ with st.sidebar:
                     st.session_state.chat_history = []
                     
                     st.success("Document processed successfully!")
+                    
                 except PDFProcessingError as e:
                     st.error(str(e))
                 except Exception as e:
                     st.error(f"An unexpected error occurred: {e}")
+            
+            # Generate document summary (runs after index is built)
+            if st.session_state.vector_store is not None:
+                with st.spinner("Generating document summary..."):
+                    try:
+                        summary = summarize_documents(docs)
+                        st.session_state.doc_summary = summary
+                    except Exception as e:
+                        st.warning(f"Could not generate summary: {e}")
                     
     elif os.path.exists("/tmp/faiss_index") and st.session_state.vector_store is None:
         # Load existing index if present
@@ -107,6 +120,11 @@ with st.sidebar:
 if st.session_state.vector_store is None:
     st.info("👈 Please upload and process a PDF document to begin chatting.")
 else:
+    # --- Document Summary ---
+    if st.session_state.doc_summary:
+        with st.expander("📋 Document Summary", expanded=True):
+            st.markdown(st.session_state.doc_summary)
+
     # Display chat history
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
