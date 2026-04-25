@@ -1,7 +1,10 @@
 streamlit
 langchain
-langchain-google-genai
+langchain-classic
+langchain-groq
 langchain-community
+langchain-huggingface
+sentence-transformers
 pymupdf
 faiss-cpu
 python-dotenv

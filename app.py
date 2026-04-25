@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import time
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -15,7 +16,7 @@ load_dotenv()
 st.set_page_config(page_title="DocuChat", page_icon="📄", layout="centered")
 
 st.title("📄 DocuChat")
-st.markdown("Upload one or more PDF documents and ask questions about their content. Powered by **Gemini 2.5 Flash** and **FAISS**.")
+st.markdown("Upload one or more PDF documents and ask questions about their content. Powered by **Llama 3.3 70B** (Groq) and **FAISS**.")
 
 # Initialize session state for chat history and vector store
 if "messages" not in st.session_state:
@@ -207,12 +208,28 @@ else:
             with st.spinner("Thinking..."):
                 qa_chain = build_qa_chain(st.session_state.vector_store)
                 
-                try:
-                    response = qa_chain.invoke({
-                        "question": prompt,
-                        "chat_history": st.session_state.chat_history
-                    })
-                    
+                # Retry logic for transient Google API 500 errors
+                max_retries = 3
+                response = None
+                for attempt in range(max_retries):
+                    try:
+                        response = qa_chain.invoke({
+                            "question": prompt,
+                            "chat_history": st.session_state.chat_history
+                        })
+                        break  # Success — exit retry loop
+                    except Exception as e:
+                        err_str = str(e)
+                        if "500" in err_str and attempt < max_retries - 1:
+                            wait = 2 ** attempt  # 1s, 2s, 4s
+                            time.sleep(wait)
+                            continue
+                        else:
+                            st.error(f"Error generating answer: {e}")
+                            response = None
+                            break
+                
+                if response is not None:
                     answer = response["answer"]
                     source_docs = response.get("source_documents", [])
                     
@@ -247,6 +264,3 @@ else:
                         
                     st.session_state.messages.append(ass_msg)
                     st.session_state.chat_history.append((prompt, answer))
-                    
-                except Exception as e:
-                    st.error(f"Error generating answer: {e}")

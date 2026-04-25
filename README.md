@@ -3,15 +3,16 @@
 DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built to allow natural language conversations with PDF documents. Answers are strictly grounded in the uploaded document and include direct page citations, eliminating hallucination.
 
 ## 🚀 Features
-- **PDF Processing**: Upload documents up to 20MB. Automatically extracts text using PyMuPDF.
-- **RAG Pipeline**: Splits text into context-preserving chunks, embedded using Gemini `embedding-001`.
+- **Multi-PDF Processing**: Upload multiple documents up to 20MB. Automatically extracts text using PyMuPDF and merges them into a single knowledge base.
+- **RAG Pipeline**: Splits text into context-preserving chunks, embedded locally using `all-MiniLM-L6-v2` via sentence-transformers (zero API cost/rate limits).
 - **In-Memory Vector Search**: Uses FAISS for ultra-fast, local similarity search.
-- **Strict Grounding**: Gemini 1.5 Flash generates answers **only** from the provided text, adding source page citations to every response.
-- **Interactive UI**: Clean, responsive Streamlit chat interface with full conversation history during the session.
+- **Smart Grounding**: Powered by Groq's `llama-3.3-70b-versatile` model. Capable of synthesizing answers across multiple documents while providing accurate page and file citations.
+- **Interactive UI**: Clean, responsive Streamlit chat interface with full conversation history and per-document summaries.
 
 ## 🏗 Stack Overview
 - **Language**: Python 3.11
-- **LLM/Embeddings**: Google Gemini API (`1.5-Flash`, `embedding-001`)
+- **LLM**: Groq API (`llama-3.3-70b-versatile`)
+- **Embeddings**: Local HuggingFace sentence-transformers (`all-MiniLM-L6-v2`)
 - **Orchestration**: LangChain
 - **Vector DB**: FAISS (CPU)
 - **Frontend**: Streamlit
@@ -33,7 +34,7 @@ DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built
    pip install -r requirements.txt
    ```
 4. **Configure Environment variables**
-   Copy the example environment file and add your `GEMINI_API_KEY`:
+   Copy the example environment file and add your `GROQ_API_KEY`:
    ```bash
    cp .env.example .env
    # Edit .env with your api key
@@ -44,7 +45,7 @@ DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built
    ```
 
 ## 🐳 Docker Setup
-1. Define your `GEMINI_API_KEY` inside the `.env` file.
+1. Define your `GROQ_API_KEY` inside the `.env` file.
 2. Build and start the container:
    ```bash
    docker-compose up --build
@@ -53,7 +54,7 @@ DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built
 
 ## 🧠 Architecture
 1. **Ingest**: PDF parsed via PyMuPDF. Text heavily chunked using LangChain's `RecursiveCharacterTextSplitter`.
-2. **Embed**: Text chunks mapped to dense vectors by Gemini's `embedding-001`.
+2. **Embed**: Text chunks mapped to dense 384-dimensional vectors by the local `all-MiniLM-L6-v2` model.
 3. **Index**: Embeddings loaded into FAISS vector store. Temporary cached copies store to `/tmp/faiss_index` for persistence over Streamlit session reruns.
 4. **Query**: User queries embedded -> Similarity Search via FAISS bounds top-k contextual text blocks.
 5. **Generate**: Extracted chunk bodies injected into strict LangChain prompt alongside the question.
