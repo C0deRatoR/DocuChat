@@ -2,14 +2,14 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from src.utils.pdf_utils import validate_pdf, extract_pages, PDFProcessingError
 
-def process_pdf(file_bytes: bytes, chunk_size: int = 2000, chunk_overlap: int = 200) -> list[Document]:
+def process_pdf(file_bytes: bytes, source_filename: str = "document.pdf", chunk_size: int = 2000, chunk_overlap: int = 200) -> list[Document]:
     """
     End-to-end processing of a PDF file upload:
     1. Validate PDF
     2. Extract text with page numbers
     3. Split into manageable chunks
     
-    Returns a list of LangChain Document objects containing the chunk text and page metadata.
+    Returns a list of LangChain Document objects containing the chunk text and page/source metadata.
     """
     doc = validate_pdf(file_bytes)
     
@@ -36,7 +36,10 @@ def process_pdf(file_bytes: bytes, chunk_size: int = 2000, chunk_overlap: int = 
             documents.append(
                 Document(
                     page_content=chunk,
-                    metadata={"page_number": page["page_number"]}
+                    metadata={
+                        "page_number": page["page_number"],
+                        "source": source_filename,
+                    }
                 )
             )
             

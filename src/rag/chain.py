@@ -6,8 +6,9 @@ from src.rag.retriever import get_retriever
 
 def get_qa_prompt() -> PromptTemplate:
     template = """You are a precise document assistant. Answer the question using ONLY the context below.
-If the answer is not in the context, say "I could not find this in the document."
+If the answer is not in the context, say "I could not find this in the documents."
 Do not use any external knowledge.
+When the context comes from multiple documents, reference the source document name in your answer where relevant.
 
 Context:
 {context}

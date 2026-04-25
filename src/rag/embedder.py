@@ -30,3 +30,17 @@ def load_faiss_index(folder_path: str = "/tmp/faiss_index", allow_dangerous_dese
     embeddings = get_embeddings_model()
     # allow_dangerous_deserialization is needed in newer versions of LangChain for local FAISS loads
     return FAISS.load_local(folder_path, embeddings, allow_dangerous_deserialization=allow_dangerous_deserialization)
+
+def merge_faiss_indices(stores: list[FAISS]) -> FAISS:
+    """
+    Merges a list of FAISS vector stores into a single unified store.
+    The first store is used as the base, and the rest are merged into it.
+    """
+    if not stores:
+        raise ValueError("No FAISS stores provided to merge.")
+    
+    base = stores[0]
+    for store in stores[1:]:
+        base.merge_from(store)
+    
+    return base
