@@ -1,6 +1,8 @@
 # DocuChat — RAG-Powered PDF Q&A
 
-DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built to allow natural language conversations with PDF documents. Answers are strictly grounded in the uploaded document and include direct page citations, eliminating hallucination.
+DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built to allow
+natural language conversations with PDF documents. Answers are strictly grounded in the
+uploaded document and include direct page citations, eliminating hallucination.
 
 ## 🚀 Features
 - **Multi-PDF Processing**: Upload multiple documents up to 20MB. Automatically extracts text using PyMuPDF and merges them into a single knowledge base.
@@ -46,6 +48,7 @@ DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built
 
 ## 🐳 Docker Setup
 **Note:** Ollama requires a running server. For Docker, either:
+
 - Run Ollama on your host and expose port 11434, or
 - Use the host network mode
 
@@ -57,14 +60,21 @@ DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built
 3. Access the app locally at: `http://localhost:8501`.
 
 ## 🧠 Architecture
+
 1. **Ingest**: PDF parsed via PyMuPDF. Text heavily chunked using LangChain's `RecursiveCharacterTextSplitter`.
-2. **Embed**: Text chunks mapped to dense 384-dimensional vectors by the local `all-MiniLM-L6-v2` model.
-3. **Index**: Embeddings loaded into FAISS vector store. Temporary cached copies store to `/tmp/faiss_index` for persistence over Streamlit session reruns.
-4. **Query**: User queries embedded -> Similarity Search via FAISS bounds top-k contextual text blocks.
-5. **Generate**: Extracted chunk bodies injected into strict LangChain prompt alongside the question.
-6. **Cite**: Page-level metadata preserved at chunking is surfaced alongside the generated answers.
+2. **Embed**: Text chunks mapped to dense 384-dimensional vectors by the local
+   `all-MiniLM-L6-v2` model.
+3. **Index**: Embeddings loaded into FAISS vector store. Temporary cached copies store
+   to `/tmp/faiss_index` for persistence over Streamlit session reruns.
+4. **Query**: User queries embedded -> Similarity Search via FAISS bounds top-k
+   contextual text blocks.
+5. **Generate**: Extracted chunk bodies injected into strict LangChain prompt
+   alongside the question.
+6. **Cite**: Page-level metadata preserved at chunking is surfaced alongside the
+   generated answers.
 
 ## ⚠️ Notes
+
 - Does not currently support scanned (image-only) PDFs or password-protected files.
 - Max PDF limit optimized natively for <20MB for fast pipeline throughput.
 
