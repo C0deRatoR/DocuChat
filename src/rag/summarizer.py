@@ -1,10 +1,10 @@
-from langchain_groq import ChatGroq
+from langchain_ollama import ChatOllama
 from langchain_core.documents import Document
 
 
 def summarize_documents(documents: list[Document], max_chars: int = 15000) -> str:
     """
-    Generates a concise summary of the uploaded document using Groq (Llama 3.3 70B).
+    Generates a concise summary of the uploaded document using Ollama (Llama 3.2 3B).
 
     Samples text evenly across chunks to stay within token limits, then asks
     the LLM for a structured markdown summary.
@@ -37,7 +37,7 @@ def summarize_documents(documents: list[Document], max_chars: int = 15000) -> st
     combined_text = combined_text[:max_chars]
 
     # --- Build and invoke the summary chain ---
-    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+    llm = ChatOllama(model="llama3.2", temperature=0)
 
     prompt = f"""You are a document analyst. Read the following text extracted from a PDF
 and produce a concise summary in **markdown** format.

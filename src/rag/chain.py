@@ -1,6 +1,6 @@
 from langchain_classic.chains import ConversationalRetrievalChain
 from langchain_core.prompts import PromptTemplate
-from langchain_groq import ChatGroq
+from langchain_ollama import ChatOllama
 from langchain_community.vectorstores import FAISS
 from src.rag.retriever import get_retriever
 
@@ -43,15 +43,16 @@ Standalone Question:"""
 def build_qa_chain(vector_store: FAISS):
     """
     Builds the Conversational Retrieval Chain.
-    Uses Groq (Llama 3.3 70B) for answering — free tier with 14,400 req/day.
+    Uses Ollama with Llama 3.2 (3B) — completely free, runs locally.
+    Requires Ollama server running: ollama serve
     Returns the chain.
     """
-    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.1)
+    llm = ChatOllama(model="llama3.2", temperature=0.1)
     retriever = get_retriever(vector_store, k=5)
-    
+
     qa_prompt = get_qa_prompt()
     condense_prompt = get_condense_prompt()
-    
+
     chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=retriever,
@@ -59,5 +60,5 @@ def build_qa_chain(vector_store: FAISS):
         combine_docs_chain_kwargs={"prompt": qa_prompt},
         condense_question_prompt=condense_prompt,
     )
-    
+
     return chain

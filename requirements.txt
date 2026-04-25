@@ -1,7 +1,7 @@
 streamlit
 langchain
 langchain-classic
-langchain-groq
+langchain-ollama
 langchain-community
 langchain-huggingface
 sentence-transformers

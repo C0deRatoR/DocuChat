@@ -6,12 +6,12 @@ DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built
 - **Multi-PDF Processing**: Upload multiple documents up to 20MB. Automatically extracts text using PyMuPDF and merges them into a single knowledge base.
 - **RAG Pipeline**: Splits text into context-preserving chunks, embedded locally using `all-MiniLM-L6-v2` via sentence-transformers (zero API cost/rate limits).
 - **In-Memory Vector Search**: Uses FAISS for ultra-fast, local similarity search.
-- **Smart Grounding**: Powered by Groq's `llama-3.3-70b-versatile` model. Capable of synthesizing answers across multiple documents while providing accurate page and file citations.
+- **Smart Grounding**: Powered by Ollama's `llama3.2` model. Capable of synthesizing answers across multiple documents locally while providing accurate page and file citations.
 - **Interactive UI**: Clean, responsive Streamlit chat interface with full conversation history and per-document summaries.
 
 ## 🏗 Stack Overview
 - **Language**: Python 3.11
-- **LLM**: Groq API (`llama-3.3-70b-versatile`)
+- **LLM**: Ollama (`llama3.2` 3B) — free, runs locally
 - **Embeddings**: Local HuggingFace sentence-transformers (`all-MiniLM-L6-v2`)
 - **Orchestration**: LangChain
 - **Vector DB**: FAISS (CPU)
@@ -33,11 +33,11 @@ DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built
    ```bash
    pip install -r requirements.txt
    ```
-4. **Configure Environment variables**
-   Copy the example environment file and add your `GROQ_API_KEY`:
+4. **Install & Start Ollama**
    ```bash
-   cp .env.example .env
-   # Edit .env with your api key
+   # Install Ollama: https://ollama.ai
+   ollama pull llama3.2
+   ollama serve
    ```
 5. **Run the App**
    ```bash
@@ -45,7 +45,11 @@ DocuChat is a Retrieval-Augmented Generation (RAG) powered web application built
    ```
 
 ## 🐳 Docker Setup
-1. Define your `GROQ_API_KEY` inside the `.env` file.
+**Note:** Ollama requires a running server. For Docker, either:
+- Run Ollama on your host and expose port 11434, or
+- Use the host network mode
+
+1. Start Ollama: `ollama serve` (on host or in a separate container)
 2. Build and start the container:
    ```bash
    docker-compose up --build

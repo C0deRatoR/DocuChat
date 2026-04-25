@@ -16,7 +16,7 @@ load_dotenv()
 st.set_page_config(page_title="DocuChat", page_icon="📄", layout="centered")
 
 st.title("📄 DocuChat")
-st.markdown("Upload one or more PDF documents and ask questions about their content. Powered by **Llama 3.3 70B** (Groq) and **FAISS**.")
+st.markdown("Upload one or more PDF documents and ask questions about their content. Powered by **Llama 3.2** (Ollama) and **FAISS**.")
 
 # Initialize session state for chat history and vector store
 if "messages" not in st.session_state:
